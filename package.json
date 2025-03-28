@@ -1,0 +1,24 @@
+{
+  "name": "com.adrianyip.events",
+  "version": "0.1.0",
+  "displayName": "AYip Events",
+  "description": "This is a simplest but robust events package for events and event bus.",
+  "unity": "2019.1",
+  "documentationUrl": "https://github.com/adrianyip-1222/ayip-package-events",
+  "changelogUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.1.0/CHANGELOG.md",
+  "licensesUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.1.0/LICENSE",
+  "dependencies": {
+    "com.adrianyip.foundation": "0.1.0"
+  },
+  "keywords": [
+    "eventbus",
+    "observer",
+    "subscribe",
+    "subscription"
+  ],
+  "author": {
+    "name": "Yip Ka Ming",
+    "email": "adrianyip1222@gmail.com",
+    "url": "https://github.com/adrianyip-1222/"
+  }
+}
