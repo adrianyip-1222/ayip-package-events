@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using AYip.Foundations;
+using UnityEngine;
 
 namespace AYip.Events
 {
@@ -15,12 +16,17 @@ namespace AYip.Events
         /// <summary>
         /// A list of events and their subscription types.
         /// </summary>
-        private readonly ConcurrentDictionary<Type, List<(Type SubscriptionType, Action<IEvent> Handler)>> _handlers = new();
+        private readonly ConcurrentDictionary<Type, List<(Action<IEvent> Handler, int Priority)>> _handlers = new();
 
         /// <summary>
         /// Subscribe to a specific type or interface
         /// </summary>
-        public void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : IEvent
+        public void Subscribe<TEvent>(Action<TEvent> handler, Priority priority = Priority.Unset) where TEvent : IEvent
+        {
+            Subscribe(handler, (int)priority);
+        }
+        
+        public void Subscribe<TEvent>(Action<TEvent> handler, int priority) where TEvent : IEvent
         {
             if (handler == null) throw new ArgumentNullException(nameof(handler));
 
@@ -34,10 +40,10 @@ namespace AYip.Events
 
             _handlers.AddOrUpdate(
                 key: subscriptionType,
-                addValue: new List<(Type, Action<IEvent>)> { (subscriptionType, wrappedHandler) },
+                addValue: new List<(Action<IEvent> handler, int priority)> { (wrappedHandler, priority) },
                 updateValueFactory: (_, existingHandlers) =>
                 {
-                    existingHandlers.Add((subscriptionType, wrappedHandler));
+                    existingHandlers.Add((wrappedHandler, priority));
                     return existingHandlers;
                 });
         }
@@ -57,7 +63,7 @@ namespace AYip.Events
             
             Action<IEvent> wrappedHandler = @event => handler((TEvent)@event);
             
-            handlers.RemoveAll(pair => pair.SubscriptionType == subscriptionType &&
+            handlers.RemoveAll(pair =>
                                     pair.Handler.Method == wrappedHandler.Method &&
                                     pair.Handler.Target == wrappedHandler.Target);
 
@@ -78,20 +84,23 @@ namespace AYip.Events
                 throw new InvalidOperationException("Cannot publish a disposed event");
 
             var eventType = typeof(TEvent);
+
             var allTypes = eventType.GetInterfaces()
                 .Where(i => typeof(IEvent).IsAssignableFrom(i))
                 .Concat(new[] { eventType });
 
-            foreach (var type in allTypes)
+            var handlers = allTypes
+                .Where(type => _handlers.ContainsKey(type))
+                .SelectMany(type => _handlers[type])
+                .OrderByDescending(handler => handler.Priority)
+                .ToArray();
+
+            if (!handlers.Any()) return;
+
+            foreach (var handler in handlers)
             {
-                if (!_handlers.TryGetValue(type, out var handlers)) 
-                    continue;
-        
-                foreach (var handler in handlers)
-                {
-                    if (disposableEvent?.IsDisposed == true) break;
-                    handler.Handler(@event);
-                }
+                if (disposableEvent?.IsDisposed == true) break;
+                handler.Handler(@event);
             }
 
             if (!autoDispose) 

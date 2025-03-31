@@ -118,6 +118,11 @@ private EventBus _eventBus;
 private void OnEnable ()
 {
     _eventBus.Subscribe<FooEvent>(OnFooPublished);
+    
+    // Subscribe the event with priority.
+    // Higher priority of events will get executed first.
+    _eventBus.Subscribe<FooEvent>(OnFooPublished, Priority.Highest);
+    _eventBus.Subscribe<FooEvent>(OnFooPublished, priority: 999);
 }
 
 private void OnEnable ()
