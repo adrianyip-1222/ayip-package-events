@@ -16,7 +16,7 @@ namespace AYip.Events
         /// <summary>
         /// A list of events and their subscription types.
         /// </summary>
-        private readonly ConcurrentDictionary<Type, List<(Action<IEvent> Handler, int Priority)>> _handlers = new();
+        private readonly ConcurrentDictionary<Type, List<(object Handler, int Priority)>> _handlers = new();
 
         /// <summary>
         /// Subscribe to a specific type or interface
@@ -31,19 +31,13 @@ namespace AYip.Events
             if (handler == null) throw new ArgumentNullException(nameof(handler));
 
             var subscriptionType = typeof(TEvent);
-            
-            Action<IEvent> wrappedHandler = @event =>
-            {
-                if (@event is IDisposableEvent { IsDisposed: true }) return;
-                handler((TEvent)@event);
-            };
 
             _handlers.AddOrUpdate(
                 key: subscriptionType,
-                addValue: new List<(Action<IEvent> handler, int priority)> { (wrappedHandler, priority) },
+                addValue: new List<(object, int)> { (handler, priority) },
                 updateValueFactory: (_, existingHandlers) =>
                 {
-                    existingHandlers.Add((wrappedHandler, priority));
+                    existingHandlers.Add((handler, priority));
                     return existingHandlers;
                 });
         }
@@ -58,17 +52,13 @@ namespace AYip.Events
 
             var subscriptionType = typeof(TEvent);
             
-            if (!_handlers.TryGetValue(subscriptionType, out var handlers)) 
+            if (!_handlers.TryGetValue(subscriptionType, out var events)) 
                 return;
             
-            Action<IEvent> wrappedHandler = @event => handler((TEvent)@event);
-            
-            handlers.RemoveAll(pair =>
-                                    pair.Handler.Method == wrappedHandler.Method &&
-                                    pair.Handler.Target == wrappedHandler.Target);
+            events.RemoveAll(eventSet => (Action<TEvent>)eventSet.Handler == handler);
 
-            if (handlers.Count > 0) return;
-            _handlers.TryRemove(subscriptionType, out _);
+            if (events.Count == 0)
+                _handlers.TryRemove(subscriptionType, out _);
         }
 
         /// <summary>
@@ -89,21 +79,21 @@ namespace AYip.Events
                 .Where(i => typeof(IEvent).IsAssignableFrom(i))
                 .Concat(new[] { eventType });
 
-            var handlers = allTypes
+            var events = allTypes
                 .Where(type => _handlers.ContainsKey(type))
                 .SelectMany(type => _handlers[type])
-                .OrderByDescending(handler => handler.Priority)
+                .OrderByDescending(eventSet => eventSet.Priority)
                 .ToArray();
 
-            if (!handlers.Any()) return;
+            if (!events.Any()) return;
 
-            foreach (var handler in handlers)
+            foreach (var eventSet in events)
             {
                 if (disposableEvent?.IsDisposed == true) break;
-                handler.Handler(@event);
+                (eventSet.Handler as Action<TEvent>).Invoke(@event);
             }
 
-            if (!autoDispose) 
+            if (autoDispose) 
                 disposableEvent?.Dispose();
         }
     }
