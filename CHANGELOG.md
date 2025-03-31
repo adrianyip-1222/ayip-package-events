@@ -1,4 +1,7 @@
 # Changelog
+## 0.2.1
+- Fixed highest priority not working properly.
+
 ## 0.2.0
 - Added priority on event subscription.
 
