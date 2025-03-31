@@ -1,3 +1,7 @@
-# 0.1.0 Changelog
+# Changelog
+## 0.2.0
+- Added priority on event subscription.
+
+## 0.1.0
 - Added an event bus (supports interface and thread-safe)
 - **IEvent**, **EventBase**, **ScriptableObjectEvent** are what you need for creating an event. 
