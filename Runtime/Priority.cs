@@ -6,6 +6,6 @@ namespace AYip.Events
         Low = -10000,
         Unset = 0,
         High = 10000,
-        Highest = int.MinValue,
+        Highest = int.MaxValue,
     }
 }
