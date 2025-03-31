@@ -1,4 +1,8 @@
 # Changelog
+## 0.2.2
+- Fixed event unsubscription not working with event wrapper.
+- Add basic unit tests for the event bus.
+
 ## 0.2.1
 - Fixed highest priority not working properly.
 
