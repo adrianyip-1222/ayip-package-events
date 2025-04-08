@@ -8,7 +8,8 @@
   "changelogUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.2.2/CHANGELOG.md",
   "licensesUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.2.2/LICENSE",
   "dependencies": {
-    "com.adrianyip.foundation": "0.1.0"
+    "com.adrianyip.foundation": "0.1.0",
+    "com.cysharp.unitask": "2.5.10"
   },
   "keywords": [
     "eventbus",

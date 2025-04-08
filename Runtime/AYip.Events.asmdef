@@ -2,7 +2,8 @@
     "name": "AYip.Events",
     "rootNamespace": "",
     "references": [
-        "AYip.Foundation"
+        "AYip.Foundation",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
