@@ -4,7 +4,7 @@
 You can choose one of these three ways (but not limited to...) to instantiate an event bus.
 ### Event Bus (simplest way)
 ```C#
-// Pass around the eventbus on your own method.
+// Pass around the eventbus reference by yourself.
 var eventBus = new EventBus();
 ```
 
@@ -14,7 +14,7 @@ public class EventBusInstaller : Installer<EventBusInstaller>
 {
     public override void InstallBindings()
     {
-        // You can have multiple even buses
+        // You can have multiple event buses
         // So it can be not in singleton.
         Container.Bind<EventBus>().AsSingle();
     }
@@ -27,7 +27,7 @@ public class FooLifetimeScope : VContainer.Unity.LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
-        // You can have multiple even buses
+        // You can have multiple event buses
         // So it can be not in singleton.
         builder.Register<EventBus>(Lifetime.Singleton);
     }
@@ -53,7 +53,7 @@ public class FooEvent : EventBase
 
 ```
 ### Events (readonly struct, parameterless)
-When it comes with struct, you need to handle the ID and timestamp your own.
+When it comes with struct, you need to handle the ID and timestamp on your own.
 ```C#
 public readonly struct FooEvent : IEvent
 {
