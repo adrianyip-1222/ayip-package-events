@@ -1,14 +1,15 @@
 {
   "name": "com.adrianyip.events",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "displayName": "AYip Events",
   "description": "This is a simplest but robust events package for events and event bus.",
   "unity": "2019.1",
   "documentationUrl": "https://github.com/adrianyip-1222/ayip-package-events",
-  "changelogUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.2.2/CHANGELOG.md",
-  "licensesUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.2.2/LICENSE",
+  "changelogUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.3.0/CHANGELOG.md",
+  "licensesUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.3.0/LICENSE",
   "dependencies": {
-    "com.adrianyip.foundation": "0.1.0"
+    "com.adrianyip.foundation": "0.1.0",
+    "com.cysharp.unitask": "2.5.10"
   },
   "keywords": [
     "eventbus",
