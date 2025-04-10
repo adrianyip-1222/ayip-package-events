@@ -159,6 +159,7 @@ public FooSoEvent soEvent;
 
 private void SomeFunction ()
 {
+    ///////////////////////////////////// Usage
     // Simplest object, auto-dispose
     _eventBus.Publish (new FooEvent ());
     _eventBus.Publish (new FooEvent (), autoDispose: true);
@@ -166,6 +167,11 @@ private void SomeFunction ()
     // Simplest object w/o auto-dispose
     _eventBus.Publish (new FooEvent (), false);
     _eventBus.Publish (new FooEvent (), autoDispose: false);
+    
+    // Publish asynchronously 
+    // (experimental feature, not yet supported cancellation)
+    _eventBus.PublishAsync (new FooEvent ());
+    _eventBus.PublishAsync (new FooEvent (), autoDispose: true);
     
     // Readonly struct w/ parameterless
     _eventBus.Publish (FooEvent.Create());
@@ -181,5 +187,16 @@ private void SomeFunction ()
     // ScriptableObject w/ a reference.
     var so2 = Instantiate (soEvent);
     _eventBus.Publish (so2);
+    
+    ////////////////////////////////////////////////////// Return value
+    // Publish function returns a boolean to indicate
+    // whether if the event has any subscribers.
+    var hasSubscribers = _eventBus.Publish (new FooEvent());
+    if (!hasSubscribers)
+    {
+        // Do your stuff...
+        // Release some resources for example.
+    }
+    
 }
 ```
