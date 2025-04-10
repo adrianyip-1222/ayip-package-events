@@ -105,12 +105,13 @@ namespace AYip.Events
         /// <summary>
         /// Publish an event to its type and all interfaces.
         /// </summary>
-        public void Publish<TEvent>(TEvent @event, bool autoDispose = true) where TEvent : IEvent
+        /// <returns>true if there is any subscribed handler.</returns>
+        public bool Publish<TEvent>(TEvent @event, bool autoDispose = true) where TEvent : IEvent
         {
             var disposableEvent = @event as IDisposableEvent;
             
             if (!TryGetHandlers(@event, out var handlers))
-                return;
+                return false;
 
             foreach (var handler in handlers)
             {
@@ -120,6 +121,8 @@ namespace AYip.Events
 
             if (autoDispose)
                 disposableEvent?.Dispose();
+
+            return true;
         }
 
         private bool TryGetHandlers<TEvent>(TEvent @event, out object[] handlers) where TEvent : IEvent
