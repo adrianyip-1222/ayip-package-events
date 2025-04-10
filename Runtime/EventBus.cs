@@ -65,7 +65,7 @@ namespace AYip.Events
         }
 
         /// <summary>
-        /// Publish an event to its type and all interfaces asynchronously.
+        /// (EXPERIMENTAL!) Publish an event to its type and all interfaces asynchronously.
         /// </summary>
         public async UniTask PublishAsync<TEvent>(TEvent @event, bool autoDispose = true) where TEvent : IEvent
         {
