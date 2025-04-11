@@ -1,4 +1,7 @@
 # Changelog
+## 0.3.2
+- Added back the link.xml.meta
+
 ## 0.3.1
 - Prevent any type being stripped during build time.
 
