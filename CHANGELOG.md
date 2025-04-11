@@ -1,4 +1,7 @@
 # Changelog
+## 0.3.1
+- Prevent any type being stripped during build time.
+
 ## 0.3.0
 - Support PublishAsync (experimental feature)
 - Simply return boolean on Publish function to indicate if there is any subscribed handlers to the published event.
