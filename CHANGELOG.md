@@ -1,4 +1,7 @@
 # Changelog
+## 0.3.3
+- Moved the link.xml and its meta file to the runtime folder to take effective.
+
 ## 0.3.2
 - Added back the link.xml.meta
 
