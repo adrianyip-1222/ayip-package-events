@@ -1,4 +1,7 @@
 # Changelog
+## 0.4.0
+- Support parameterless callbacks
+
 ## 0.3.3
 - Moved the link.xml and its meta file to the runtime folder to take effective.
 
