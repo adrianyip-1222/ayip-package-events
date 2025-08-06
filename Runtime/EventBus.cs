@@ -2,8 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using AYip.Foundations;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace AYip.Events
 {
@@ -19,7 +17,7 @@ namespace AYip.Events
         private readonly ConcurrentDictionary<Type, List<(object Handler, int Priority)>> _handlers = new();
 
         /// <summary>
-        /// Subscribe to a specific type or interface.
+        /// Subscribe to a specific type or interface with a typed handler.
         /// </summary>
         public void Subscribe<TEvent>(Action<TEvent> handler, Priority priority = Priority.Unset) where TEvent : IEvent
         {
@@ -27,7 +25,7 @@ namespace AYip.Events
         }
 
         /// <summary>
-        /// Subscribe to a specific type or interface with a custom priority.
+        /// Subscribe to a specific type or interface with a typed handler and custom priority.
         /// </summary>
         public void Subscribe<TEvent>(Action<TEvent> handler, int priority) where TEvent : IEvent
         {
@@ -46,7 +44,34 @@ namespace AYip.Events
         }
 
         /// <summary>
-        /// Unsubscribe from a specific type or interface.
+        /// Subscribe to a specific type or interface with a parameterless handler.
+        /// </summary>
+        public void Subscribe<TEvent>(Action handler, Priority priority = Priority.Unset) where TEvent : IEvent
+        {
+            Subscribe<TEvent>(handler, (int)priority);
+        }
+
+        /// <summary>
+        /// Subscribe to a specific type or interface with a parameterless handler and custom priority.
+        /// </summary>
+        public void Subscribe<TEvent>(Action handler, int priority) where TEvent : IEvent
+        {
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+
+            var subscriptionType = typeof(TEvent);
+
+            _handlers.AddOrUpdate(
+                key: subscriptionType,
+                addValue: new List<(object, int)> { (handler, priority) },
+                updateValueFactory: (_, existingHandlers) =>
+                {
+                    existingHandlers.Add((handler, priority));
+                    return existingHandlers;
+                });
+        }
+
+        /// <summary>
+        /// Unsubscribe a typed handler from a specific type or interface.
         /// </summary>
         public void Unsubscribe<TEvent>(Action<TEvent> handler) where TEvent : IEvent
         {
@@ -65,41 +90,22 @@ namespace AYip.Events
         }
 
         /// <summary>
-        /// (EXPERIMENTAL!) Publish an event to its type and all interfaces asynchronously.
+        /// Unsubscribe a parameterless handler from a specific type or interface.
         /// </summary>
-        public async UniTask PublishAsync<TEvent>(TEvent @event, bool autoDispose = true) where TEvent : IEvent
+        public void Unsubscribe<TEvent>(Action handler) where TEvent : IEvent
         {
-            var disposableEvent = @event as IDisposableEvent;
+            if (handler == null)
+                throw new ArgumentNullException(nameof(handler));
 
-            if (!TryGetHandlers(@event, out var handlers))
+            var subscriptionType = typeof(TEvent);
+
+            if (!_handlers.TryGetValue(subscriptionType, out var events))
                 return;
-            
-            var tasks = new List<UniTask>();
-            foreach (var handler in handlers)
-            {
-                var task = UniTask.RunOnThreadPool(() =>
-                {
-                    if (disposableEvent is not null && disposableEvent.IsDisposed)
-                        return UniTask.CompletedTask;
 
-                    return UniTask.RunOnThreadPool(() => (handler as Action<TEvent>)?.Invoke(@event));
-                });
-                tasks.Add(task);
-            }
+            events.RemoveAll(eventSet => (Action)eventSet.Handler == handler);
 
-            try
-            {
-                await UniTask.WhenAll(tasks);
-            }
-            catch (Exception exception)
-            {
-                Debug.LogException(exception);
-            }
-            finally
-            {
-                if (autoDispose)
-                    disposableEvent?.Dispose();
-            }
+            if (events.Count == 0)
+                _handlers.TryRemove(subscriptionType, out _);
         }
 
         /// <summary>
@@ -116,7 +122,15 @@ namespace AYip.Events
             foreach (var handler in handlers)
             {
                 if (disposableEvent is not null && disposableEvent.IsDisposed) break;
-                (handler as Action<TEvent>)?.Invoke(@event);
+                
+                if (handler is Action<TEvent> typedHandler)
+                {
+                    typedHandler.Invoke(@event);
+                }
+                else if (handler is Action parameterlessHandler)
+                {
+                    parameterlessHandler.Invoke();
+                }
             }
 
             if (autoDispose)
@@ -179,7 +193,6 @@ namespace AYip.Events
             }
 
             // Sort handlers by priority (descending)
-            // Assuming eventSets are of type EventSet with a Priority property
             for (var i = 0; i < handlerList.Count - 1; i++)
             {
                 for (var j = 0; j < handlerList.Count - i - 1; j++)
