@@ -1,4 +1,7 @@
 # Changelog
+## 1.0.1
+- Fixed an error on unsubscribing events when there have both handler types in the registry.
+
 ## 1.0.0
 - Adapt new namespace of Foundation (1.0.0)
 

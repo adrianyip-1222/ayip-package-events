@@ -83,7 +83,15 @@ namespace AYip.Events
             if (!_handlers.TryGetValue(subscriptionType, out var events))
                 return;
 
-            events.RemoveAll(eventSet => (Action<TEvent>)eventSet.Handler == handler);
+            events.RemoveAll(eventSet =>
+            {
+                if (eventSet.Handler is not Action<TEvent> action)
+                {
+                    return false;
+                }
+                
+                return action == handler;
+            });
 
             if (events.Count == 0)
                 _handlers.TryRemove(subscriptionType, out _);
@@ -102,7 +110,15 @@ namespace AYip.Events
             if (!_handlers.TryGetValue(subscriptionType, out var events))
                 return;
 
-            events.RemoveAll(eventSet => (Action)eventSet.Handler == handler);
+            events.RemoveAll(eventSet =>
+            {
+                if (eventSet.Handler is not Action action)
+                {
+                    return false;
+                }
+                
+                return action == handler;
+            });
 
             if (events.Count == 0)
                 _handlers.TryRemove(subscriptionType, out _);
