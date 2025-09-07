@@ -1,4 +1,7 @@
 # Changelog
+## 1.0.0
+- Adapt new namespace of Foundation (1.0.0)
+
 ## 0.4.0
 - Support parameterless callbacks
 
