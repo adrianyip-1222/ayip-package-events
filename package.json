@@ -9,7 +9,7 @@
     "licensesUrl": "https://github.com/adrianyip-1222/ayip-package-events/blob/0.4.0/LICENSE",
     "dependencies":
     {
-        "com.adrianyip.foundation": "0.1.0",
+        "com.adrianyip.foundation": "1.0.0",
         "com.cysharp.unitask": "2.5.10"
     },
     "keywords":
