@@ -1,5 +1,5 @@
 using System;
-using AYip.Foundations;
+using AYip.Foundation;
 
 namespace AYip.Events
 {
